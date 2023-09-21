@@ -1,6 +1,5 @@
 <template>
   <div>
-    <p>Simple drag & drop functionality</p>
     <SimpleDrag /> 
   </div>
 </template>
