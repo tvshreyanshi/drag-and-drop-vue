@@ -1,6 +1,6 @@
 <template>
   <div>
-    <SimpleDrag />
+    <SimpleDrag /> 
   </div>
 </template>
 
