@@ -22,7 +22,7 @@
             @dragover.prevent="internalAllowDrop"
             @drop.prevent="internalDrop(index, itemindex)"
           >
-            {{ item.name }}
+          <span v-if="item && item.html" v-html="item.html"></span>
           </li>
         </ul>
       </div>
@@ -37,11 +37,11 @@ export default {
     const response = ref({"data": [
           {
             title:'Array 1',
-            data:[{ name: "AA", age: 11 }, { name: "BB", age: 22 }, { name: "CC", age: 33 },]
+            data:[{ html: "<p>AA<p>", age: 11 }, { html: "<p>BB</p>", age: 22 }, { html: "<p>CC</p>", age: 33 },]
           },
           {
             title: 'Array 2',
-            data:[{ name: "XX", age: 66 }],
+            data:[{ html: "<p>XX</p>", age: 66 }],
           },
           {
             title: 'Array 3',
@@ -68,23 +68,32 @@ export default {
       const draggedItemObj = targetArray.data.splice(draggedItem.value, 1)[0];
       targetArray.data.splice(targetIndex, 0, draggedItemObj);
 
-      draggedItem.value = null;
-      draggedArray.value = null;
+      // draggedItem.value = null;
+      // draggedArray.value = null;
     };
+
+    
     const dropItem = (targetArrayIndex, event) => {
+      console.log('draggedItem', draggedItem);
       if (draggedItem.value === null || draggedArray.value === null) return;
 
       const targetArray = response.value.data[targetArrayIndex];
-      const targetList = event.target.parentElement;
+      const targetList = event.currentTarget;
       const targetIndex = Array.from(targetList.children).indexOf(event.target);
+      console.log('targetIndex', targetIndex);
+      console.log('targetList', targetList);
+      
       if (targetIndex === targetList.children.length - 1) {
         const sourceArrayIndex = draggedArray.value;
+        console.log('sourceArrayIndex', sourceArrayIndex);
+        console.log('targetArrayIndex', targetArrayIndex);
         if (sourceArrayIndex !== targetArrayIndex) {
           const sourceArray = response.value.data[sourceArrayIndex];
           targetArray.data.push(sourceArray.data[draggedItem.value]);
           sourceArray.data.splice(draggedItem.value, 1);
         }
       } else {
+        
         const sourceArrayIndex = draggedArray.value;
         if (sourceArrayIndex !== targetArrayIndex) {
           const sourceArray = response.value.data[sourceArrayIndex];
@@ -92,7 +101,7 @@ export default {
           sourceArray.data.splice(draggedItem.value, 1);
         }
       }
-
+  
       draggedItem.value = null;
       draggedArray.value = null;
     };
