@@ -8,7 +8,10 @@
       >
         <div class="column__title--wrapper">
           <h2 class="w-100">{{ data.title }}</h2>
-          <font-awesome-icon :icon="['fas', 'plus']" class="column__item--cta" />
+          <font-awesome-icon
+            :icon="['fas', 'plus']"
+            class="column__item--cta"
+          />
           <font-awesome-icon :icon="['fas', 'ellipsis']" class="icons" />
         </div>
         <ul
@@ -25,8 +28,19 @@
             @dragover.prevent="internalAllowDrop"
             @drop.prevent="internalDrop(index, itemindex)"
           >
-            <span class="card__tag card__tag--browser">Browser</span>
-            <span class="card__tag card__tag--design">Design</span>
+            <div>
+              <span
+                v-if="item && item.html"
+                v-html="item.html"
+                class="card__tag"
+              ></span>
+              <button @click="openModal(item)" class="float-end border-0">
+                <font-awesome-icon
+                  class="icons float-end"
+                  :icon="['fas', 'pen-to-square']"
+                />
+              </button>
+            </div>
             <span v-if="item && item.html" v-html="item.html"></span>
             <div class="card__actions">
               <li class="card__actions--wrapper">
@@ -37,210 +51,234 @@
                 <font-awesome-icon :icon="['far', 'comment']" class="icons" />
                 <div class="card__avatars">
                   <li class="card__avatars--item">
-                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRuXwdzjy8m5Awd5zZ6GknOv2dVo0xYeHEvJu3JGU3SlXEH7y1WV4GIpgSlAmQIN4a0qBI&usqp=CAU" alt="Man standing near balcony" class="avatar__image">
+                    <img
+                      src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRuXwdzjy8m5Awd5zZ6GknOv2dVo0xYeHEvJu3JGU3SlXEH7y1WV4GIpgSlAmQIN4a0qBI&usqp=CAU"
+                      alt="Man standing near balcony"
+                      class="avatar__image"
+                    />
                   </li>
                 </div>
               </li>
             </div>
-          </li>{{ addNewCard }}
-          <ul
-          v-if="addNewCard"
-          class="card__list"
-          @drop.prevent="dropItem(index, $event)"
-          @dragover.prevent="allowDrop"
-        >
-          <li
-            class="card__item"
-            :draggable="true"
-            @dragstart="dragStart(index, itemindex)"
-            @dragover.prevent="internalAllowDrop"
-            @drop.prevent="internalDrop(index, itemindex)"
-          >
-            <span class="card__tag card__tag--browser">Browser</span>
-            <span class="card__tag card__tag--design">Design</span>
-            <span></span>
-            <div class="card__actions">
-              <li class="card__actions--wrapper">
-                <font-awesome-icon
-                  class="icons"
-                  :icon="['fas', 'align-left']"
-                />
-                <font-awesome-icon :icon="['far', 'comment']" class="icons" />
-                <div class="card__avatars">
-                  <li class="card__avatars--item">
-                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRuXwdzjy8m5Awd5zZ6GknOv2dVo0xYeHEvJu3JGU3SlXEH7y1WV4GIpgSlAmQIN4a0qBI&usqp=CAU" alt="Man standing near balcony" class="avatar__image">
-                  </li>
-                </div>
-              </li>
-            </div>
-            <div class="form-group">
-            <label for="cardTitle">Title:</label>
-            <input v-model="newCard.title" type="text" id="cardTitle" />
-          </div>
-          <div class="form-group">
-            <label for="cardDescription">Description:</label>
-            <textarea v-model="newCard.description" id="cardDescription"></textarea>
-          </div>
-          <button @click="addCard(id)">Add Card</button>
+          </li>
+          <li class="card__item" v-if="addingCard == index">
+            <button class="float-end border-0" @click="closeCard()">
+              <font-awesome-icon
+                class="icons float-end"
+                :icon="['fas', 'xmark']"
+              />
+            </button>
+            <input
+              v-model="newCard.title"
+              type="text"
+              placeholder="Card Title"
+              class="add-input"
+            />
+            <textarea
+              v-model="newCard.description"
+              placeholder="Card Description"
+              class="add-textarea"
+            ></textarea>
+            <button class="btn add-btn p-2" @click.prevent="addCard(index)">
+              <h6 class="mb-0">+ Add Card</h6>
+            </button>
           </li>
         </ul>
-        </ul>
-          <button class="add-btn" @click.prevent="addCard(index)">
-            <!-- <font-awesome-icon :icon="['fas', 'plus']" class="icons" /> -->
-            <h6>+ Add another card</h6>
-          </button>
+        <button class="btn add-btn" @click.prevent="showAddCardUI(index)">
+          <!-- <font-awesome-icon :icon="['fas', 'plus']" class="icons" /> -->
+          <h6 class="mb-0">+ Add another card</h6>
+        </button>
+      </li>
+      <li class="card__item" v-if="addinglist">
+        <button class="float-end border-0" @click="closeNewList()">
+          <font-awesome-icon class="icons float-end" :icon="['fas', 'xmark']" />
+        </button>
+        <input
+          v-model="newList.listTitle"
+          type="text"
+          placeholder="Card Title"
+          class="add-input"
+        />
+        <button class="btn add-btn" @click.prevent="addList()">
+          <h6 class="mb-0">+ Add New List</h6>
+        </button>
+      </li>
+      <li class="column__item h-100">
+        <button class="btn add-btn" @click.prevent="showAddListUI()">
+          <!-- <font-awesome-icon :icon="['fas', 'plus']" class="icons" /> -->
+          <h6 class="mb-0">+ Add another List</h6>
+        </button>
       </li>
     </ul>
-    <!-- <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-body">
-            <div class="form-group">
-            <label for="cardTitle">Title:</label>
-            <input v-model="newCard.title" type="text" id="cardTitle" />
-          </div>
-          <div class="form-group">
-            <label for="cardDescription">Description:</label>
-            <textarea v-model="newCard.description" id="cardDescription"></textarea>
-          </div>
-          <button @click="addCard(id)">Add Card</button>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary">Save changes</button>
-          </div>
-        </div>
-      </div>
-    </div> -->
-    
+    <EditModal
+      :isOpen="isModalOpened"
+      @modal-close="closeModal"
+      @edit-data="editdata"
+      @submit="submitHandler"
+      name="first-modal"
+    />
   </section>
 </template>
-<script>
+<script setup>
+import EditModal from "./Modal/EditModal.vue";
 import { ref } from "vue";
-export default {
-  name: "SimpleDrag",
-  setup() {
-    const response = ref({
+
+const isModalOpened = ref(false);
+const draggedItem = ref(null);
+const draggedArray = ref(null);
+let addingCard = ref(null);
+let addinglist = ref(null);
+
+const response = ref({
+  data: [
+    {
+      title: "Array 1",
+      drop_col_id: "",
       data: [
-        {
-          title: "Array 1",
-          drop_col_id:'',
-          data: [
-            { html: "<p>AA<p>", age: 11 },
-            { html: "<p>BB</p>", age: 22 },
-            { html: "<p>CC</p>", age: 33 },
-          ],
-        },
-        {
-          title: "Array 2",
-          data: [{ html: "<p>XX</p>", age: 66 }],
-        },
-        {
-          title: "Array 3",
-          data: [],
-        },
+        { html: "<p>AA<p>", age: 11 },
+        { html: "<p>BB</p>", age: 22 },
+        { html: "<p>CC</p>", age: 33 },
       ],
+    },
+    {
+      title: "Array 2",
+      data: [{ html: "<p>XX</p>", age: 66 }],
+    },
+    {
+      title: "Array 3",
+      data: [],
+    },
+  ],
+});
+const newCard = ref({
+  title: "",
+  description: "",
+});
+const newList = ref({
+  listTitle: "",
+});
+const openModal = (event) => {
+  isModalOpened.value = true;
+  console.log("event", event);
+};
+const closeModal = () => {
+  isModalOpened.value = false;
+};
+
+const submitHandler = () => {
+  //here you do whatever
+};
+const showAddCardUI = (index) => {
+  addingCard.value = index;
+};
+const showAddListUI = () => {
+  addinglist.value = true;
+};
+const closeCard = () => {
+  addingCard.value = null;
+};
+const closeNewList = () => {
+  addinglist.value = null;
+};
+const addCard = (index) => {
+  console.log('index', index);
+  if (newCard.value.title.trim() !== "") {
+    if (!response.value.data[index]) {
+      response.value.data[index] = { data: [] };
+    }
+    response.value.data[index].data.push({
+      html: `<p>${newCard.value.title}</p>`,
+      age: `<p>${newCard.value.description}</p>`, // Set the age as needed
     });
-    const draggedItem = ref(null);
-    const draggedArray = ref(null);
-    let getArrayId = ref(null);
-    let addNewCard = ref(false);
-    const newCard = ref({
-      title: "",
-      description: "",
+    newCard.value.title = "";
+    newCard.value.description = "";
+    addingCard.value = null;
+  }
+};
+const addList = () => {
+  if (newList.value.listTitle.trim() !== "") {
+    if (!response.value.data) {
+      response.value.data = { data: [] };
+    }
+    response.value.data.push({
+      title: `${newList.value.listTitle}`,
+      data: [],
     });
-    
-    const addCard = (index) => {
+    newList.value.listTitle = "";
+    addinglist.value = null;
+  }
+};
+const editdata = () => {
+  console.log('edit');
+}
 
-      console.log('avla--------', getArrayId);
-      if (newCard.value.title.trim() !== "") {
-        if (!response.value.data[index]) {
-          response.value.data[index] = { data: [] };
-        }
-        console.log('res', response.value);
-        response.value.data[index].data.push({
-          html: `<p>${newCard.value.title}</p>`,
-          age: `<p>${newCard.value.description}</p>`, // Set the age as needed
-        });
-        console.log('response', response.value);
-        newCard.value.title = "";
-        newCard.value.description = "";
+const dragStart = (arrayIndex, itemIndex) => {
+  draggedItem.value = itemIndex;
+  draggedArray.value = arrayIndex;
+};
+const allowDrop = (event) => {
+  event.preventDefault();
+};
+const internalAllowDrop = (event) => {
+  event.preventDefault();
+};
+const internalDrop = (targetArrayIndex, targetIndex) => {
+  if (draggedItem.value === null || draggedArray.value === null) return;
+  if (draggedArray.value === targetArrayIndex) {
+    const targetArray = response.value.data[targetArrayIndex];
+    const draggedItemObj = targetArray.data.splice(draggedItem.value, 1)[0];
+    targetArray.data.splice(targetIndex, 0, draggedItemObj);
+  }
+};
+
+const dropItem = (targetArrayIndex, event) => {
+  event.preventDefault();
+  if (draggedItem.value === null || draggedArray.value === null) return;
+
+  const targetArray = response.value.data[targetArrayIndex];
+  const targetList = event.target.parentElement;
+  if (targetList && targetList.children !== null) {
+    const targetIndex = Array.from(targetList && targetList.children).indexOf(
+      event.target
+    );
+    if (targetIndex === targetList && targetList.children.length - 1) {
+      const sourceArrayIndex = draggedArray.value;
+      if (sourceArrayIndex !== targetArrayIndex) {
+        const sourceArray = response.value.data[sourceArrayIndex];
+        targetArray.data.push(sourceArray.data[draggedItem.value]);
+        sourceArray.data.splice(draggedItem.value, 1);
       }
-    };
-
-    const dragStart = (arrayIndex, itemIndex) => {
-      draggedItem.value = itemIndex;
-      draggedArray.value = arrayIndex;
-    };
-    const allowDrop = (event) => {
-      event.preventDefault();
-    };
-    const internalAllowDrop = (event) => {
-      event.preventDefault();
-    };
-    const internalDrop = (targetArrayIndex, targetIndex) => {
-      if (draggedItem.value === null || draggedArray.value === null) return;
-      if(draggedArray.value === targetArrayIndex){
-        const targetArray = response.value.data[targetArrayIndex];
-        const draggedItemObj = targetArray.data.splice(draggedItem.value, 1)[0];
-        targetArray.data.splice(targetIndex, 0, draggedItemObj);
+    } else {
+      const sourceArrayIndex = draggedArray.value;
+      if (sourceArrayIndex !== targetArrayIndex) {
+        const sourceArray = response.value.data[sourceArrayIndex];
+        targetArray.data.splice(
+          targetIndex,
+          0,
+          sourceArray.data[draggedItem.value]
+        );
+        sourceArray.data.splice(draggedItem.value, 1);
       }
-    };
-
-    const dropItem = (targetArrayIndex, event) => {
-      event.preventDefault();
-      if (draggedItem.value === null || draggedArray.value === null) return;
-
-      const targetArray = response.value.data[targetArrayIndex];
-      const targetList = event.target.parentElement;
-      const targetIndex = Array.from(targetList && targetList.children).indexOf(event.target);
-      if (targetIndex === targetList && targetList.children.length - 1) {
-        const sourceArrayIndex = draggedArray.value;
-        if (sourceArrayIndex !== targetArrayIndex) {
-          const sourceArray = response.value.data[sourceArrayIndex];
-          targetArray.data.push(sourceArray.data[draggedItem.value]);
-          sourceArray.data.splice(draggedItem.value, 1);
-        }
-      } else {
-        const sourceArrayIndex = draggedArray.value;              
-        if (sourceArrayIndex !== targetArrayIndex) {
-          const sourceArray = response.value.data[sourceArrayIndex];
-          targetArray.data.splice(targetIndex, 0, sourceArray.data[draggedItem.value]);
-          sourceArray.data.splice(draggedItem.value, 1);
-        }
-      }
-      draggedItem.value = null;
-      draggedArray.value = null;
-    };
-    return {
-      response,
-      dragStart,
-      allowDrop,
-      dropItem,
-      internalDrop,
-      internalAllowDrop,
-      addCard,
-      newCard,
-      addNewCard,
-    };
-  },
+    }
+  }
+  draggedItem.value = null;
+  draggedArray.value = null;
 };
 </script>
+
+
 <style>
 .column__list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  grid-gap: 0.5rem;
-  align-items: start;
-  /* uncomment these lines if you want to have the standard Trello behavior instead of the column wrapping */
-  /*   grid-auto-flow: column;
-    grid-auto-columns: minmax(260px, 1fr); */
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
 }
 
 .column__item {
   border-radius: 0.2rem;
   background-color: #dfe3e6;
   padding: 0.5rem;
+  min-width: 270px;
 }
 
 .column__title--wrapper {
@@ -256,7 +294,8 @@ export default {
   font-size: 0.9rem;
 }
 
-.column__title--wrapper .icons {
+.column__title--wrapper .icons,
+.icons {
   text-align: right;
   color: #798d99;
 }
@@ -276,6 +315,7 @@ export default {
   grid-gap: 0.5rem;
   margin: 0.5rem 0;
   height: calc(100% - 80px);
+  min-height: 50px;
 }
 
 .card__item {
@@ -283,14 +323,16 @@ export default {
   border-radius: 0.25rem;
   box-shadow: 0 1px 0 rgba(9, 45, 66, 0.25);
   padding: 0.5rem;
+  height: fit-content;
+  min-width: 250px;
 }
 
 .card__tag {
-  font-size: 0.75rem;
+  font-size: 1rem;
   padding: 0.1rem 0.5rem;
   border-radius: 0.25rem;
   font-weight: 700;
-  color: white;
+  color: black;
   margin-bottom: 0.75rem;
   display: inline-block;
   margin-left: 0.2rem;
@@ -380,7 +422,8 @@ li {
 ol {
   list-style-type: none;
 }
-ol, ul {
+ol,
+ul {
   padding-left: 0%;
 }
 .add-btn {
@@ -390,5 +433,14 @@ ol, ul {
   box-shadow: 0 1px 0 rgba(9, 45, 66, 0.25);
   display: flex;
   justify-content: center;
+}
+.add-input,
+.add-textarea,
+.add-input:focus-visible {
+  margin: 5px 0;
+  width: 100%;
+  border-radius: 3px;
+  border: 1px solid #80808052;
+  font-size: 12px;
 }
 </style>

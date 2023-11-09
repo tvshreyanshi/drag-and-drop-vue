@@ -17,7 +17,8 @@ export default {
 
 <style>
 body {
-  font-family: 'Helvetica Neue',Arial,Helvetica,sans-serif;
+ font-family: 'Helvetica Neue',Arial,Helvetica,sans-serif;
+ background: #80929b;
 }
 
 /* .wrapper {
