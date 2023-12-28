@@ -1,17 +1,17 @@
 <template>
   <div v-if="isOpen" class="modal-mask">
     <div class="modal-wrapper">
-      <div class="modal-container" ref="target">
+      <div class="modal-container rounded-3" ref="target">
         <div class="modal-header">
-          <slot name="header"> default header </slot>
+          <p name="header" v-html="getData.html"></p>
         </div>
         <div class="modal-body">
-          <slot name="content"> default content </slot>
+          <slot name="content"> {{ getData.age }} </slot>
         </div>
         <div class="modal-footer">
           <slot name="footer">
             <div>
-              <button @click.stop="emit('edit-data')">Submit</button>
+              <button @click.stop="UpdateData()">Submit</button>
             </div>
           </slot>
         </div>
@@ -20,27 +20,36 @@
   </div>
 </template>
 <script setup>
-import { defineProps, defineEmits, ref } from "vue";
-import {onClickOutside} from '@vueuse/core'
+import { defineProps, defineEmits, ref, computed } from "vue";
+import { onClickOutside } from "@vueuse/core";
 
 const props = defineProps({
   isOpen: {
     type: Boolean,
-  default: false,
-}
+    default: false,
+  },
+  data: {
+    default: () => ({}),
+  },
+  type: String,
 });
-const emit = defineEmits(["modal-close"], ['edit-data']);
+const emit = defineEmits(["modal-close"], ["edit-data"]);
 
 const target = ref(null);
 
-onClickOutside(target, ()=> {
-  console.log('isopen', props.isOpen);
+onClickOutside(target, () => {
+  // console.log('isopen', props.isOpen);
   if (props.isOpen) {
-    emit('modal-close');
+    emit("modal-close");
   }
-
 });
-
+const getData = computed(() => {
+  // console.log('response', props.data.age);
+  return props.data;
+});
+const UpdateData = () => {
+  emit("edit-data");
+};
 </script>
 
 <style scoped>
@@ -61,5 +70,4 @@ onClickOutside(target, ()=> {
   border-radius: 2px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
 }
-
 </style>

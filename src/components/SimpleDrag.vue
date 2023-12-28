@@ -11,6 +11,7 @@
           <font-awesome-icon
             :icon="['fas', 'plus']"
             class="column__item--cta"
+            @click.prevent="showAddCardUI(index)"
           />
           <font-awesome-icon :icon="['fas', 'ellipsis']" class="icons" />
         </div>
@@ -34,9 +35,12 @@
                 v-html="item.html"
                 class="card__tag"
               ></span>
+              <button @click="openDeleteModal(item)" class=" btn  p-0 float-end border-0">
+                <font-awesome-icon class="icons" :icon="['fas', 'trash-can']" />
+              </button>
               <button @click="openModal(item)" class="float-end border-0">
                 <font-awesome-icon
-                  class="icons float-end"
+                  class="icons p-0"
                   :icon="['fas', 'pen-to-square']"
                 />
               </button>
@@ -45,7 +49,7 @@
             <div class="card__actions">
               <li class="card__actions--wrapper">
                 <font-awesome-icon
-                  class="icons"
+                  class="icons ml-5"
                   :icon="['fas', 'align-left']"
                 />
                 <font-awesome-icon :icon="['far', 'comment']" class="icons" />
@@ -68,25 +72,28 @@
                 :icon="['fas', 'xmark']"
               />
             </button>
-            <input
-              v-model="newCard.title"
-              type="text"
-              placeholder="Card Title"
-              class="add-input"
-            />
-            <textarea
-              v-model="newCard.description"
-              placeholder="Card Description"
-              class="add-textarea"
-            ></textarea>
-            <button class="btn add-btn p-2" @click.prevent="addCard(index)">
-              <h6 class="mb-0">+ Add Card</h6>
-            </button>
+            <slot name="cardForm" />
+            <div v-if="!$slots.cardForm">
+              <input
+                v-model="newCard.title"
+                type="text"
+                placeholder="Card Title"
+                class="add-input"
+              />
+              <textarea
+                v-model="newCard.description"
+                placeholder="Card Description"
+                class="add-textarea"
+              ></textarea>
+              <button class="btn add-btn p-2" @click.prevent="addCard(index)">
+                <h6 class="mb-0">{{addCardTitle}}</h6>
+              </button>
+            </div>
           </li>
         </ul>
         <button class="btn add-btn" @click.prevent="showAddCardUI(index)">
           <!-- <font-awesome-icon :icon="['fas', 'plus']" class="icons" /> -->
-          <h6 class="mb-0">+ Add another card</h6>
+          <h6 class="mb-0">{{addCardTitle}}</h6>
         </button>
       </li>
       <li class="card__item" v-if="addinglist">
@@ -96,17 +103,17 @@
         <input
           v-model="newList.listTitle"
           type="text"
-          placeholder="Card Title"
+          placeholder="Section Title"
           class="add-input"
         />
         <button class="btn add-btn" @click.prevent="addList()">
-          <h6 class="mb-0">+ Add New List</h6>
+          <h6 class="mb-0">{{addSectionTitle}}</h6>
         </button>
       </li>
       <li class="column__item h-100">
         <button class="btn add-btn" @click.prevent="showAddListUI()">
           <!-- <font-awesome-icon :icon="['fas', 'plus']" class="icons" /> -->
-          <h6 class="mb-0">+ Add another List</h6>
+          <h6 class="mb-0">{{addSectionTitle}}</h6>
         </button>
       </li>
     </ul>
@@ -116,40 +123,53 @@
       @edit-data="editdata"
       @submit="submitHandler"
       name="first-modal"
+      :data="geteditData"
+    />
+    <DeleteConfirmation
+    deleteMessage="Are you sure you want to Delete the Card?"
+    :isOpenDeleteModal="isOpenDeleteModal"
+    @modal-close="closeDeleteModal"
+    name="delete-confirmation-modal"
     />
   </section>
 </template>
 <script setup>
 import EditModal from "./Modal/EditModal.vue";
-import { ref } from "vue";
+import DeleteConfirmation from "./Modal/DeleteConfirmation.vue";
+import { ref, defineProps, defineEmits } from "vue";
 
-const isModalOpened = ref(false);
+// const isModalOpened = ref(false);
 const draggedItem = ref(null);
 const draggedArray = ref(null);
 let addingCard = ref(null);
 let addinglist = ref(null);
 
-const response = ref({
-  data: [
-    {
-      title: "Array 1",
-      drop_col_id: "",
-      data: [
-        { html: "<p>AA<p>", age: 11 },
-        { html: "<p>BB</p>", age: 22 },
-        { html: "<p>CC</p>", age: 33 },
-      ],
-    },
-    {
-      title: "Array 2",
-      data: [{ html: "<p>XX</p>", age: 66 }],
-    },
-    {
-      title: "Array 3",
-      data: [],
-    },
-  ],
+const props = defineProps({
+  responseData: {
+    type: Object,
+    required: true,
+  },
+  isModalOpened: {
+    type: Boolean,
+    required: true,
+  },
+  addCardTitle: {
+    type: Text,
+  },
+  addSectionTitle: {
+    type: Text
+  },
+  isOpenDeleteModal: {
+    type: Boolean,
+    default: false,
+  }
 });
+const emit = defineEmits(["add-card", "edit-card"]);
+
+const response = ref(props.responseData);
+const isModalOpened = ref(props.isModalOpened);
+const isOpenDeleteModal = ref(props.isOpenDeleteModal);
+const geteditData = ref({});
 const newCard = ref({
   title: "",
   description: "",
@@ -159,11 +179,18 @@ const newList = ref({
 });
 const openModal = (event) => {
   isModalOpened.value = true;
-  console.log("event", event);
+  // console.log("event", event);
+  geteditData.value = event;
 };
+const openDeleteModal = () => {
+  isOpenDeleteModal.value = true;
+}
 const closeModal = () => {
   isModalOpened.value = false;
 };
+const closeDeleteModal = () => {
+  isOpenDeleteModal.value = false;
+}
 
 const submitHandler = () => {
   //here you do whatever
@@ -181,7 +208,7 @@ const closeNewList = () => {
   addinglist.value = null;
 };
 const addCard = (index) => {
-  console.log('index', index);
+  // console.log('index', index);
   if (newCard.value.title.trim() !== "") {
     if (!response.value.data[index]) {
       response.value.data[index] = { data: [] };
@@ -190,6 +217,7 @@ const addCard = (index) => {
       html: `<p>${newCard.value.title}</p>`,
       age: `<p>${newCard.value.description}</p>`, // Set the age as needed
     });
+    emit('add-card', {index:index, value:response.value.data[index].data[response.value.data[index].data.length - 1], updatedValue: response.value });
     newCard.value.title = "";
     newCard.value.description = "";
     addingCard.value = null;
@@ -208,8 +236,9 @@ const addList = () => {
     addinglist.value = null;
   }
 };
-const editdata = () => {
-  console.log('edit');
+const editdata = (event) => {
+  // console.log('edit', event);
+  emit('edit-card', event);
 }
 
 const dragStart = (arrayIndex, itemIndex) => {
