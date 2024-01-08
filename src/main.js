@@ -2,16 +2,14 @@ import { createApp } from 'vue'
 import 'bootstrap/dist/css/bootstrap.css'
 import bootstrap from 'bootstrap/dist/js/bootstrap.js'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
-// import SimpleDrag from 'drag-n-drop'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { fas } from '@fortawesome/free-solid-svg-icons';
-import { fab } from '@fortawesome/free-brands-svg-icons';
-import { far } from '@fortawesome/free-regular-svg-icons';
+import SimpleDragVue from './components/SimpleDrag.vue'
 import App from './App.vue'
+import './assets/css/style.css'
 
-library.add(fas);
-library.add(fab);
-library.add(far);
+createApp(App).use(bootstrap).mount('#app')
 
-createApp(App).use(bootstrap).component('font-awesome-icon', FontAwesomeIcon).mount('#app')
+export default {
+    install(app) {
+        app.component('SimpleDragVue', SimpleDragVue);
+    }
+}

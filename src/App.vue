@@ -1,16 +1,18 @@
 <template>
   <div>
     <SimpleDrag
+      :isCustomEdit="false"
       :responseData="response"
       :isModalOpened="modalOpened"
       addCardTitle="+Add Card"
       addSectionTitle="Add Section"
       @add-card="addNewCard"
       @edit-card="editData"
+      @delete-card="deleteCard"
     >
-      <template v-slot:cardForm>
-      <input type="text" />
-    </template>
+      <!-- <template v-slot:cardForm>
+      <input type="shreya" />
+    </template> -->
     </SimpleDrag>
   </div>
 </template>
@@ -23,39 +25,70 @@ import SimpleDrag from "./components/SimpleDrag.vue";
 const response = ref({
   data: [
     {
-      title: "Array 1",
+      title: "Section 1",
       drop_col_id: "",
       data: [
-        { html: "<p>AA<p>", age: 11 },
-        { html: "<p>BB</p>", age: 22 },
-        { html: "<p>CC</p>", age: 33 },
+        { 
+          title: 'Card 1',
+          description: "<p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here'<p>",
+          attachment: null,
+          deadlineDate: new Date(new Date().getTime() + 2 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }), 
+        },
+        { 
+          title: 'Card 2',
+          description: "<p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here'<p>",
+          attachment: null,
+          deadlineDate: new Date(new Date().getTime() + 2 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
+          },
+        { 
+          title: "Card 3",
+          description: "<p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here'<p>",
+          attachment: null,
+          deadlineDate: new Date(new Date().getTime() + 2 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
+        },
       ],
     },
     {
-      title: "Array 2",
-      data: [{ html: "<p>XX</p>", age: 66 }],
+      title: "Section 2",
+      data: [
+        { 
+          title: 66, 
+          description: "<p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here'<p>",
+          attachment: null,
+          deadlineDate: new Date(new Date().getTime() + 2 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
+          }
+      ],
     },
     {
-      title: "Array 3",
+      title: "Section 3",
       data: [],
     },
   ],
 });
 const modalOpened = ref(false);
-const addNewCard = () => {
+const addNewCard = () => {};
+const editData = (event) => {
+  const arrayIndex = event.arrayindex;
+  const itemIndex = event.itemindex;
+  response.value.data[arrayIndex].data[itemIndex].title = event.title;
+  response.value.data[arrayIndex].data[itemIndex].description = event.description;
+  response.value.data[arrayIndex].data[itemIndex].deadlineDate = event.deadlineDate;
+  response.value.data[arrayIndex].data[itemIndex].attachment = event.attachment;
 };
-const editData = () => {
-  // console.log('edit data in app', event);
-}
+const deleteCard = (event) => {
+  const arrayIndex = event.arrayindex;
+  const itemIndex = event.itemindex;
+  response.value.data[arrayIndex].data.splice(itemIndex, 1);
+};
 </script>
 
 <style>
-body {
-  font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
-  background: #80929b;
-}
-
-/* .wrapper {
-  padding: 1rem;
+/* #app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+  margin-top: 60px;
 } */
 </style>
