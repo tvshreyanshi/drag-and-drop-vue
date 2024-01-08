@@ -1,27 +1,28 @@
 <template>
-  <section class="wrapper p-5">
-    <ul class="column__list h-100">
+  <section>
+    <ul class="tvd__column__list">
       <li
-        class="column__item h-100"
+        class="tvd__column__item"
         v-for="(data, index) in response.data"
         :key="index"
       >
-        <div class="column__title--wrapper">
-          <h2 class="w-100">{{ data.title }}</h2>
-          <font-awesome-icon
-            :icon="['fas', 'plus']"
-            class="column__item--cta"
+      <!-- section title -->
+        <div class="tvd__column__title--wrapper">
+          <h2>{{ data.title }}</h2>
+
+          <i
+            class="tvd__column__item--cta fa-solid fa-plus"
             @click.prevent="showAddCardUI(index)"
-          />
-          <font-awesome-icon :icon="['fas', 'ellipsis']" class="icons" />
+          ></i>
+          <!-- <i class="tvd__icons fa-solid fa-ellipsis"></i> -->
         </div>
         <ul
-          class="card__list"
+          class="tvd__card__list"
           @drop.prevent="dropItem(index, $event)"
           @dragover.prevent="allowDrop"
         >
           <li
-            class="card__item"
+            class="tvd__card__item"
             v-for="(item, itemindex) in data.data"
             :key="itemindex"
             :draggable="true"
@@ -29,48 +30,55 @@
             @dragover.prevent="internalAllowDrop"
             @drop.prevent="internalDrop(index, itemindex)"
           >
-            <div>
+            <div class="tvd__card__field">
+              <!-- card title -->
               <span
-                v-if="item && item.html"
-                v-html="item.html"
-                class="card__tag"
+                v-if="item && item.title"
+                v-html="item.title"
+                class="tvd__card__tag"
+                @click="openModal(item, index, itemindex, false)"
               ></span>
-              <button @click="openDeleteModal(item)" class=" btn  p-0 float-end border-0">
-                <font-awesome-icon class="icons" :icon="['fas', 'trash-can']" />
-              </button>
-              <button @click="openModal(item)" class="float-end border-0">
-                <font-awesome-icon
-                  class="icons p-0"
-                  :icon="['fas', 'pen-to-square']"
-                />
-              </button>
+              <div>
+                <button
+                  @click="openModal(item, index, itemindex, true)"
+                  class="tvd__edit_card"
+                >
+                  <i class="fa-solid fa-pen-to-square tvd__icons"></i>
+                </button>
+                <button
+                  @click="openDeleteModal(index, itemindex)"
+                  class="tvd__delete_card"
+                >
+                  <i class="tvd__icons fa-solid fa-trash-can"></i>
+                </button>
+              </div>
             </div>
-            <span v-if="item && item.html" v-html="item.html"></span>
-            <div class="card__actions">
-              <li class="card__actions--wrapper">
-                <font-awesome-icon
-                  class="icons ml-5"
-                  :icon="['fas', 'align-left']"
-                />
-                <font-awesome-icon :icon="['far', 'comment']" class="icons" />
-                <div class="card__avatars">
-                  <li class="card__avatars--item">
-                    <img
+            <div class="tvd__card__field" v-if="item && item.deadlineDate">
+              <span>{{ item.deadlineDate }}</span>
+            </div>
+            <!-- card description -->
+            <div class="tvd__card__field" v-if="item && item.description">
+              <span class="tvd__description" v-html="item.description"></span>
+            </div>
+            <div class="tvd__card__actions">
+              <li class="tvd__card__actions--wrapper">
+                <!-- <i class="icons fa-solid fa-align-left"></i>
+                <i class="icons fa-regular fa-comment"></i> -->
+                <div class="tvd__card__avatars">
+                  <li class="tvd__card__avatars--item">
+                    <!-- <img
                       src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRuXwdzjy8m5Awd5zZ6GknOv2dVo0xYeHEvJu3JGU3SlXEH7y1WV4GIpgSlAmQIN4a0qBI&usqp=CAU"
                       alt="Man standing near balcony"
-                      class="avatar__image"
-                    />
+                      class="tvd__avatar__image"
+                    /> -->
                   </li>
                 </div>
               </li>
             </div>
           </li>
-          <li class="card__item" v-if="addingCard == index">
-            <button class="float-end border-0" @click="closeCard()">
-              <font-awesome-icon
-                class="icons float-end"
-                :icon="['fas', 'xmark']"
-              />
+          <li class="tvd__card__item" v-if="addingCard == index">
+            <button class="tvd_close_addcard" @click="closeCard()">
+              <i class="tvd__icons fa-solid fa-xmark"></i>
             </button>
             <slot name="cardForm" />
             <div v-if="!$slots.cardForm">
@@ -78,58 +86,58 @@
                 v-model="newCard.title"
                 type="text"
                 placeholder="Card Title"
-                class="add-input"
+                class="tvd__add-input"
               />
               <textarea
                 v-model="newCard.description"
                 placeholder="Card Description"
-                class="add-textarea"
+                class="tvd__add-textarea"
               ></textarea>
-              <button class="btn add-btn p-2" @click.prevent="addCard(index)">
-                <h6 class="mb-0">{{addCardTitle}}</h6>
+              <button class="tvd__add-btn" @click.prevent="addCard(index)">
+                <h6>{{ addCardTitle }}</h6>
               </button>
             </div>
+            <slot name="editForm" />
           </li>
         </ul>
-        <button class="btn add-btn" @click.prevent="showAddCardUI(index)">
-          <!-- <font-awesome-icon :icon="['fas', 'plus']" class="icons" /> -->
-          <h6 class="mb-0">{{addCardTitle}}</h6>
+        <button class="tvd__add-btn" @click.prevent="showAddCardUI(index)">
+          <h6>{{ addCardTitle }}</h6>
         </button>
       </li>
-      <li class="card__item" v-if="addinglist">
-        <button class="float-end border-0" @click="closeNewList()">
-          <font-awesome-icon class="icons float-end" :icon="['fas', 'xmark']" />
+      <li class="tvd__card__item" v-if="addinglist">
+        <button class="tvd__close_section" @click="closeNewList()">
+          <i class="tvd__icons fa-solid fa-xmark"></i>
         </button>
         <input
           v-model="newList.listTitle"
           type="text"
           placeholder="Section Title"
-          class="add-input"
+          class="tvd__add-input"
         />
-        <button class="btn add-btn" @click.prevent="addList()">
-          <h6 class="mb-0">{{addSectionTitle}}</h6>
+        <button class="tvd__add-btn" @click.prevent="addList()">
+          <h6>{{ addSectionTitle }}</h6>
         </button>
       </li>
-      <li class="column__item h-100">
-        <button class="btn add-btn" @click.prevent="showAddListUI()">
-          <!-- <font-awesome-icon :icon="['fas', 'plus']" class="icons" /> -->
-          <h6 class="mb-0">{{addSectionTitle}}</h6>
+      <li class="tvd__column__item">
+        <button class="tvd__add-btn" @click.prevent="showAddListUI()">
+          <h6>{{ addSectionTitle }}</h6>
         </button>
       </li>
     </ul>
     <EditModal
+      :isEdit="isEdit"
       :isOpen="isModalOpened"
       @modal-close="closeModal"
       @edit-data="editdata"
-      @submit="submitHandler"
       name="first-modal"
       :data="geteditData"
     />
     <DeleteConfirmation
-    deleteMessage="Are you sure you want to Delete the Card?"
-    :isOpenDeleteModal="isOpenDeleteModal"
-    @modal-close="closeDeleteModal"
-    name="delete-confirmation-modal"
+      deleteMessage="Are you sure you want to Delete the Card?"
+      :isOpenDeleteModal="isOpenDeleteModal"
+      @modal-close="closeDeleteModal"
+      @confirm-delete="deleteCard()"
+      name="delete-confirmation-modal"
     />
   </section>
 </template>
@@ -138,38 +146,40 @@ import EditModal from "./Modal/EditModal.vue";
 import DeleteConfirmation from "./Modal/DeleteConfirmation.vue";
 import { ref, defineProps, defineEmits } from "vue";
 
-// const isModalOpened = ref(false);
+const isModalOpened = ref(false);
 const draggedItem = ref(null);
 const draggedArray = ref(null);
+const isEdit = ref(false);
 let addingCard = ref(null);
 let addinglist = ref(null);
+// const slots = useSlots();
 
 const props = defineProps({
   responseData: {
     type: Object,
     required: true,
   },
-  isModalOpened: {
-    type: Boolean,
-    required: true,
-  },
   addCardTitle: {
     type: Text,
   },
   addSectionTitle: {
-    type: Text
+    type: Text,
   },
   isOpenDeleteModal: {
     type: Boolean,
     default: false,
-  }
+  },
+  isCustomEdit: {
+    type: Boolean,
+    default: false,
+  },
 });
-const emit = defineEmits(["add-card", "edit-card"]);
+const emit = defineEmits(["add-card", "edit-card", "delete-card"]);
 
 const response = ref(props.responseData);
-const isModalOpened = ref(props.isModalOpened);
 const isOpenDeleteModal = ref(props.isOpenDeleteModal);
 const geteditData = ref({});
+const deleteCardData = ref({});
 const newCard = ref({
   title: "",
   description: "",
@@ -177,23 +187,38 @@ const newCard = ref({
 const newList = ref({
   listTitle: "",
 });
-const openModal = (event) => {
+const openModal = (event, arrayindex, itemindex, val) => {
+  // eslint-disable-next-line no-undef
+  // console.log("slot", slots.default()[0]);
+  isEdit.value = val;
+  geteditData.value = {
+    event,
+    arrayindex,
+    itemindex,
+  };
+  if (props.isCustomEdit == true) {
+    emit("edit-card", geteditData.value);
+    return;
+  }
+  document.body.classList.add('tvd__modal-open');
   isModalOpened.value = true;
-  // console.log("event", event);
-  geteditData.value = event;
 };
-const openDeleteModal = () => {
+const openDeleteModal = (arrayindex, itemindex) => {
+  deleteCardData.value = {
+    itemindex,
+    arrayindex,
+  };
+  document.body.classList.add('tvd__modal-open');
   isOpenDeleteModal.value = true;
-}
+};
 const closeModal = () => {
+  document.body.classList.remove('tvd__modal-open');
   isModalOpened.value = false;
 };
 const closeDeleteModal = () => {
+  document.body.classList.remove('tvd__modal-open');
   isOpenDeleteModal.value = false;
-}
-
-const submitHandler = () => {
-  //here you do whatever
+  
 };
 const showAddCardUI = (index) => {
   addingCard.value = index;
@@ -208,16 +233,22 @@ const closeNewList = () => {
   addinglist.value = null;
 };
 const addCard = (index) => {
-  // console.log('index', index);
   if (newCard.value.title.trim() !== "") {
     if (!response.value.data[index]) {
       response.value.data[index] = { data: [] };
     }
     response.value.data[index].data.push({
-      html: `<p>${newCard.value.title}</p>`,
-      age: `<p>${newCard.value.description}</p>`, // Set the age as needed
+      title: `${newCard.value.title}`,
+      description: `<p>${newCard.value.description}</p>`,
     });
-    emit('add-card', {index:index, value:response.value.data[index].data[response.value.data[index].data.length - 1], updatedValue: response.value });
+    emit("add-card", {
+      index: index,
+      value:
+        response.value.data[index].data[
+          response.value.data[index].data.length - 1
+        ],
+      updatedValue: response.value,
+    });
     newCard.value.title = "";
     newCard.value.description = "";
     addingCard.value = null;
@@ -237,9 +268,15 @@ const addList = () => {
   }
 };
 const editdata = (event) => {
-  // console.log('edit', event);
-  emit('edit-card', event);
-}
+  emit("edit-card", event);
+  document.body.classList.remove('tvd__modal-open');
+  isModalOpened.value = false;
+};
+const deleteCard = () => {
+  document.body.classList.remove('tvd__modal-open');
+  emit("delete-card", deleteCardData.value);
+  isOpenDeleteModal.value = false;
+};
 
 const dragStart = (arrayIndex, itemIndex) => {
   draggedItem.value = itemIndex;
@@ -297,179 +334,4 @@ const dropItem = (targetArrayIndex, event) => {
 
 
 <style>
-.column__list {
-  display: flex;
-  flex-direction: row;
-  gap: 10px;
-}
-
-.column__item {
-  border-radius: 0.2rem;
-  background-color: #dfe3e6;
-  padding: 0.5rem;
-  min-width: 270px;
-}
-
-.column__title--wrapper {
-  display: flex;
-  /* grid-template-columns: repeat(2, 1fr); */
-  padding: 0.25rem;
-  align-items: center;
-}
-
-.column__title--wrapper h2 {
-  color: #17394d;
-  font-weight: 700;
-  font-size: 0.9rem;
-}
-
-.column__title--wrapper .icons,
-.icons {
-  text-align: right;
-  color: #798d99;
-}
-
-.column__item--cta {
-  padding: 0.25rem;
-  display: flex;
-  color: #798d99;
-}
-
-.column__item--cta .icons {
-  margin-right: 0.25rem;
-}
-.card__list {
-  display: grid;
-  grid-template-rows: auto;
-  grid-gap: 0.5rem;
-  margin: 0.5rem 0;
-  height: calc(100% - 80px);
-  min-height: 50px;
-}
-
-.card__item {
-  background-color: white;
-  border-radius: 0.25rem;
-  box-shadow: 0 1px 0 rgba(9, 45, 66, 0.25);
-  padding: 0.5rem;
-  height: fit-content;
-  min-width: 250px;
-}
-
-.card__tag {
-  font-size: 1rem;
-  padding: 0.1rem 0.5rem;
-  border-radius: 0.25rem;
-  font-weight: 700;
-  color: black;
-  margin-bottom: 0.75rem;
-  display: inline-block;
-  margin-left: 0.2rem;
-}
-
-.card__image {
-  width: 100%;
-  margin-bottom: 0.25rem;
-}
-
-/* sticker colors */
-
-.card__tag--design {
-  background-color: #61bd4f;
-}
-
-.card__tag--browser {
-  background-color: #c377e0;
-}
-
-.card__tag--mobile {
-  background-color: #f2d600;
-}
-
-.card__tag--high {
-  background-color: #eb5a46;
-}
-
-.card__tag--low {
-  background-color: #00c2e0;
-}
-
-.card__title {
-  color: #17394d;
-  margin-bottom: 0.75rem;
-}
-
-/* card actions */
-
-.card__actions {
-  display: flex;
-  align-items: center;
-}
-
-.card__actions--wrapper .icons {
-  color: #798d99;
-  margin-right: 0.5rem;
-}
-.card__actions--wrapper {
-  display: flex;
-  width: 100%;
-}
-
-.card__actions--text {
-  color: #798d99;
-  font-size: 0.8rem;
-  margin-left: -0.25rem;
-  margin-right: 0.5rem;
-}
-
-.card__avatars {
-  display: flex;
-  flex: 1;
-  justify-content: flex-end;
-}
-
-.card__avatars--item {
-  margin-left: 0.25rem;
-  width: 28px;
-  height: 28px;
-}
-
-.avatar__image {
-  border-radius: 50%;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-ul {
-  list-style-type: none;
-}
-li {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-}
-ol {
-  list-style-type: none;
-}
-ol,
-ul {
-  padding-left: 0%;
-}
-.add-btn {
-  border: none;
-  width: 100%;
-  border-radius: 0.25rem;
-  box-shadow: 0 1px 0 rgba(9, 45, 66, 0.25);
-  display: flex;
-  justify-content: center;
-}
-.add-input,
-.add-textarea,
-.add-input:focus-visible {
-  margin: 5px 0;
-  width: 100%;
-  border-radius: 3px;
-  border: 1px solid #80808052;
-  font-size: 12px;
-}
 </style>
