@@ -1,0 +1,81 @@
+.dragging {
+  cursor: grabbing !important;
+  opacity: 0.6;
+  transform: scale(0.98);
+  box-shadow: 0 5px 10px rgba(0,0,0,0.15);
+  z-index: 999;
+}
+
+.drag-over {
+  border: 2px dashed #4a9eff !important;
+  background-color: rgba(74, 158, 255, 0.05) !important;
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
+  transition: all 0.2s ease;
+}
+
+/* Animated transitions for items */
+.tvd__card__item {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+/* Grab cursor on draggable elements */
+[draggable=true] {
+  cursor: grab;
+}
+
+/* Hover effects */
+.tvd__column__item:hover {
+  box-shadow: 0 0 15px rgba(0,0,0,0.05);
+}
+
+.tvd__card__item:hover {
+  transform: translateY(-2px);
+}
+/* Priority styles */
+.priority-urgent {
+  border-left: 5px solid #ea384c;
+}
+
+.priority-high {
+  border-left: 5px solid #9b87f5;
+}
+
+.priority-medium {
+  border-left: 5px solid #FEF7CD;
+}
+
+.priority-low {
+  border-left: 5px solid #4caf50;
+}
+
+.tvd__priority-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  margin: 3px 0;
+}
+
+.priority-badge-urgent {
+  background-color: #ffebee;
+  color: #ea384c;
+}
+
+.priority-badge-high {
+  background-color: #f5f0ff;
+  color: #9b87f5;
+}
+
+.priority-badge-medium {
+  background-color: #FEF7CD;
+  color: #777;
+}
+
+.priority-badge-low {
+  background-color: #F2FCE2;
+  color: #4caf50;
+}
