@@ -5,7 +5,7 @@
 </template>
 
 <script setup>
-import { ref, defineEmits, onMounted, onBeforeUnmount } from "vue";
+import { ref, defineEmits, onMounted } from "vue";
 
 const emit = defineEmits(['drag-start', 'drop-item', 'internal-drop', 'drag-over', 'drag-leave']);
 
@@ -22,11 +22,6 @@ onMounted(() => {
   document.addEventListener('dragend', resetDragState);
 });
 
-onBeforeUnmount(() => {
-  // Clean up event listeners
-  document.removeEventListener('dragend', resetDragState);
-});
-
 const dragStart = (sectionIndex, itemIndex, event) => {
   draggedItem.value = itemIndex;
   draggedArray.value = sectionIndex;
@@ -39,11 +34,8 @@ const dragStart = (sectionIndex, itemIndex, event) => {
     // Set drag image
     if (event.dataTransfer) {
       event.dataTransfer.effectAllowed = 'move';
-      // Store the source info in dataTransfer
-      event.dataTransfer.setData('text/plain', JSON.stringify({
-        sectionIndex,
-        itemIndex
-      }));
+      // Optional: set a custom drag image
+      // event.dataTransfer.setDragImage(event.target, 20, 20);
     }
   }
   
