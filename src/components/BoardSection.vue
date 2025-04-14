@@ -58,6 +58,25 @@
               placeholder="Card Description"
               class="tvd__add-textarea"
             ></textarea>
+            <div class="tvd__add-field">
+              <label>Priority:</label>
+              <select v-model="newCard.priority" class="tvd__add-select">
+                <option value="urgent">Urgent</option>
+                <option value="high">High</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+              </select>
+            </div>
+            
+            <div class="tvd__add-field">
+              <label>Deadline:</label>
+              <input 
+                type="date" 
+                v-model="newCard.deadlineDate" 
+                class="tvd__add-date"
+              />
+            </div>
+            
             <button class="tvd__add-btn" @click.prevent="addCard">
               <h6>{{ addCardTitle }}</h6>
             </button>
@@ -112,6 +131,8 @@ const emit = defineEmits([
 const newCard = ref({
   title: "",
   description: "",
+  priority: "medium",
+  deadlineDate: ""
 });
 
 const isDragOver = ref(false);
@@ -155,12 +176,25 @@ const onInternalDrop = (event, sectionIndex, itemIndex) => {
 
 const addCard = () => {
   if (newCard.value.title.trim() !== "") {
+    let formattedDate = "";
+    if (newCard.value.deadlineDate) {
+      const date = new Date(newCard.value.deadlineDate);
+      formattedDate = date.toLocaleDateString('en-US', { 
+        month: 'short', 
+        day: '2-digit', 
+        year: 'numeric' 
+      });
+    } else {
+      // Default to 2 days from now
+      formattedDate = new Date(new Date().getTime() + 2 * 24 * 60 * 60 * 1000)
+        .toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
+    }
     const cardData = {
       title: newCard.value.title,
       description: `<p>${newCard.value.description}</p>`,
       attachment: null,
-      deadlineDate: new Date(new Date().getTime() + 2 * 24 * 60 * 60 * 1000)
-        .toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })
+      deadlineDate: formattedDate,
+      priority: newCard.value.priority
     };
     
     emit("add-card", props.sectionIndex, cardData);
@@ -168,6 +202,8 @@ const addCard = () => {
     // Reset form
     newCard.value.title = "";
     newCard.value.description = "";
+    newCard.value.priority = "medium";
+    newCard.value.deadlineDate = "";
     emit("close-card");
   }
 };
@@ -199,5 +235,25 @@ const addCard = () => {
 
 .tvd__card__empty p {
   margin: 0;
+}
+/* New card form styles */
+.tvd__add-field {
+  margin-bottom: 10px;
+}
+
+.tvd__add-field label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.tvd__add-select,
+.tvd__add-date {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-bottom: 10px;
 }
 </style>

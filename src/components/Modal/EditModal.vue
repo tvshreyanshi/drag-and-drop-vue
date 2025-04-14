@@ -1,157 +1,250 @@
 <template>
-  <div v-if="isOpen" class="tvd__modal-mask">
-    <div class="tvd__modal-wrapper">
-      <div class="tvd__modal-container" ref="target">
+  <Teleport to="body">
+    <div v-if="isOpen" class="tvd__modal-overlay" @click.self="closeModal">
+      <div class="tvd__modal-container">
         <div class="tvd__modal-header">
-          <h6>{{ isEdit ? 'Edit Card' : 'Show Card'}}</h6>
-          <button class="tvd__close_editmodal tvd__modal-close" @click="$emit('modal-close')">
+          <h3>{{ isEdit ? 'Edit Card' : 'View Card' }}</h3>
+          <button class="tvd__modal-close" @click="closeModal">
             <i class="tvd__icons fa-solid fa-xmark"></i>
           </button>
         </div>
-        <hr class="tvd__hr"/>
-        <div class="tvd__modal-body">
-          <div v-if="!isEdit">
-            <div class="tvd__show_title" v-if="getData.event && getData.event.title">
-              <h6>{{ getData.event.title }}</h6>
-            </div>
-            <div class="tvd__show_title" v-if="getData.event && getData.event.deadlineDate">
-              <span>DeadLine:</span>
-              <span>{{ getData.event.deadlineDate }}</span>
-            </div>
-            <div v-if="getData.event && getData.event.description">
-              <span v-html="getData.event.description"></span>
-            </div>
-            <div class="tvd__image" v-if="getData.event && getData.event.attachment">
-              <div v-for="(data, index) in getData.event.attachment" :key="index">
-                <div v-if="data.type=='image'">
-                  <img class="tvd__img_attachment" :src="data.dataUrl" alt="image" />
-                </div>
-              </div>
-            </div>
+        <div class="tvd__modal-content">
+          <div class="tvd__form-group">
+            <label>Title</label>
+            <input
+              v-model="editedCard.title"
+              :disabled="!isEdit"
+              type="text"
+              class="tvd__form-control"
+            />
           </div>
-          <div v-if="isEdit">
-            <form @submit.prevent="UpdateData()">
-              <div class="tvd__form-group">
-                <label class="tvd__form-label">Title</label>
-                <input class="tvd__form-control" type="text" v-model="title" />
-              </div>
-              <div class="tvd__form-group">
-                <label class="tvd__form-label">Description</label>
-                <textarea
-                  class="tvd__form-control"
-                  rows="4"
-                  v-model="description"
-                ></textarea>
-              </div>
-              <div class="tvd__form-group">
-                <label class="tvd__form-label">Due Date</label>
-                <input
-                  class="tvd__form-control"
-                  type="date"
-                  v-model="duedate"
-                />
-              </div>
-              <div class="tvd__form-group">
-                <label class="tvd__form-label">Attachment</label>
-                <input
-                  class="tvd__form-control"
-                  type="file"
-                  multiple
-                  @change="handleFileChange"
-                />
-              </div>
-
-              <div class="tvd__modal-footer">
-                <button type="file" class="tvd__edit_btn">Submit</button>
-                <button class="tvd__edit_btn" @click="$emit('modal-close')">
-                  Close
-                </button>
-              </div>
-            </form>
+          
+          <div class="tvd__form-group">
+            <label>Description</label>
+            <textarea
+              v-model="editedCard.description"
+              :disabled="!isEdit"
+              class="tvd__form-control"
+            ></textarea>
           </div>
-          <!-- <slot name="content"> {{ getData.age }} </slot>
-          <p name="header" v-html="getData.html"></p> -->
+          
+          <div class="tvd__form-group">
+            <label>Priority</label>
+            <select 
+              v-model="editedCard.priority" 
+              :disabled="!isEdit"
+              class="tvd__form-control"
+            >
+              <option value="urgent">Urgent</option>
+              <option value="high">High</option>
+              <option value="medium">Medium</option>
+              <option value="low">Low</option>
+            </select>
+          </div>
+          
+          <div class="tvd__form-group">
+            <label>Deadline Date</label>
+            <input
+              type="date"
+              :disabled="!isEdit"
+              v-model="deadlineDateInput"
+              class="tvd__form-control"
+            />
+          </div>
+        </div>
+        <div class="tvd__modal-footer" v-if="isEdit">
+          <button class="tvd__btn tvd__btn-secondary" @click="closeModal">Cancel</button>
+          <button class="tvd__btn tvd__btn-primary" @click="saveChanges">Save</button>
+        </div>
+        <div class="tvd__modal-footer" v-else>
+          <button class="tvd__btn tvd__btn-secondary" @click="closeModal">Close</button>
         </div>
       </div>
     </div>
-  </div>
+  </Teleport>
 </template>
+
 <script setup>
-import { watch, defineProps, defineEmits, ref, computed } from "vue";
-import { onClickOutside } from "@vueuse/core";
+import { ref, defineProps, defineEmits, watch, computed } from "vue";
 
 const props = defineProps({
   isOpen: {
     type: Boolean,
-    default: false,
+    default: false
   },
   isEdit: {
     type: Boolean,
-    default: false,
+    default: false
   },
   data: {
-    default: () => ({}),
+    type: Object,
+    default: () => ({})
   },
-  type: String,
-});
-const title = ref("");
-const description = ref("");
-const duedate = ref(null);
-const attachment = ref([]);
-const emit = defineEmits(["modal-close"], ["edit-data"]);
-
-const target = ref(null);
-
-const handleFileChange = (event) => {
-  const selectedFile = event.target.files;
-  if(selectedFile && selectedFile.length > 0) {
-    const newAttachments = []
-    Array.from(selectedFile).forEach((file) => {
-      let type = file.type.split("/")[0];
-      const reader = new FileReader();
-      reader.onload = () => {
-        newAttachments.push({
-          type,
-          file,
-          dataUrl: reader.result,
-        });
-        if (newAttachments.length === selectedFile.length) {
-          attachment.value = newAttachments;
-        }
-      };
-      reader.readAsDataURL(file);
-    });
-  } else {
-    console.error('Selected files is not an array:', selectedFile);
+  name: {
+    type: String,
+    default: ""
   }
+});
+
+const emit = defineEmits(['modal-close', 'edit-data']);
+
+const editedCard = ref({
+  title: "",
+  description: "",
+  deadlineDate: "",
+  attachment: null,
+  priority: "medium"
+});
+
+// Date formatting utilities for the date input
+const deadlineDateInput = computed({
+  get() {
+    if (!editedCard.value.deadlineDate) return '';
+    
+    // Try to convert from the format "Apr 13, 2025" to YYYY-MM-DD
+    try {
+      const date = new Date(editedCard.value.deadlineDate);
+      if (isNaN(date.getTime())) return '';
+      
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    } catch (e) {
+      console.error("Error parsing date:", e);
+      return '';
+    }
+  },
+  set(value) {
+    if (!value) {
+      editedCard.value.deadlineDate = '';
+      return;
+    }
+    
+    try {
+      const date = new Date(value);
+      editedCard.value.deadlineDate = date.toLocaleDateString('en-US', { 
+        month: 'short', 
+        day: '2-digit', 
+        year: 'numeric' 
+      });
+    } catch (e) {
+      console.error("Error setting date:", e);
+    }
+  }
+});
+
+watch(() => props.data, (newData) => {
+  if (newData && newData.event) {
+    editedCard.value = {
+      title: newData.event.title || "",
+      description: newData.event.description || "",
+      deadlineDate: newData.event.deadlineDate || "",
+      attachment: newData.event.attachment || null,
+      priority: newData.event.priority || "medium"
+    };
+  }
+}, { deep: true, immediate: true });
+
+const closeModal = () => {
+  emit('modal-close');
 };
 
-onClickOutside(target, () => {
-  if (props.isOpen) {
-    emit("modal-close");
-  }
-});
-const getData = computed(() => {
-  return props.data;
-});
-const UpdateData = () => {
-  const editData = {
-    title: title.value,
-    description: description.value,
-    deadlineDate: duedate.value,
-    attachment: attachment.value,
-    arrayindex: getData.value.arrayindex,
-    itemindex: getData.value.itemindex,
-  };
-  emit("edit-data", editData);
+const saveChanges = () => {
+  emit('edit-data', {
+    arrayindex: props.data.arrayindex,
+    itemindex: props.data.itemindex,
+    title: editedCard.value.title,
+    description: editedCard.value.description,
+    deadlineDate: editedCard.value.deadlineDate,
+    attachment: editedCard.value.attachment,
+    priority: editedCard.value.priority
+  });
 };
-watch(getData, async (val) => {
-  if (val) {
-    title.value = val.event.title;
-    description.value = val.event.description;
-    duedate.value = val.event.deadlineDate;
-    attachment.value = val.event.attachment;
-  }
-});
 </script>
 
+<style>
+.tvd__modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.tvd__modal-container {
+  background-color: white;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 90%;
+  overflow-y: auto;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.tvd__modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.tvd__modal-close {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.tvd__modal-content {
+  padding: 20px;
+}
+
+.tvd__modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 15px 20px;
+  border-top: 1px solid #e0e0e0;
+  gap: 10px;
+}
+
+.tvd__form-group {
+  margin-bottom: 15px;
+}
+
+.tvd__form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+.tvd__form-control {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.tvd__btn {
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+}
+
+.tvd__btn-primary {
+  background-color: #4caf50;
+  color: white;
+}
+
+.tvd__btn-secondary {
+  background-color: #f5f5f5;
+  border: 1px solid #ccc;
+}
+</style>

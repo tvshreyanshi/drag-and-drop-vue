@@ -1,6 +1,7 @@
 <template>
   <li
     class="tvd__card__item"
+    :class="[priorityClass]"
     :draggable="true"
     @dragstart="handleDragStart"
     @dragover.prevent="handleDragOver"
@@ -37,6 +38,14 @@
         </button>
       </div>
     </div>
+
+    <!-- Priority Badge -->
+    <div class="tvd__card__field" v-if="card && card.priority">
+      <span class="tvd__priority-badge" :class="priorityBadgeClass">
+        <i :class="priorityIcon"></i>
+        {{ getPriorityLabel(card.priority) }}
+      </span>
+    </div>
     
     <!-- Card deadline -->
     <div class="tvd__card__field" v-if="card && card.deadlineDate">
@@ -65,7 +74,7 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits } from "vue";
+import { defineProps, defineEmits, computed } from "vue";
 
 const props = defineProps({
   card: {
@@ -90,6 +99,37 @@ const emit = defineEmits([
   'open-edit-modal',
   'open-delete-modal'
 ]);
+
+// Priority visual utilities
+const priorityClass = computed(() => {
+  if (!props.card.priority) return '';
+  return `priority-${props.card.priority}`;
+});
+
+const priorityBadgeClass = computed(() => {
+  if (!props.card.priority) return '';
+  return `priority-badge-${props.card.priority}`;
+});
+
+const priorityIcon = computed(() => {
+  switch (props.card.priority) {
+    case 'urgent':
+      return 'fa-solid fa-exclamation-circle';
+    case 'high':
+      return 'fa-solid fa-arrow-up';
+    case 'medium':
+      return 'fa-solid fa-minus';
+    case 'low':
+      return 'fa-solid fa-arrow-down';
+    default:
+      return 'fa-solid fa-circle';
+  }
+});
+
+const getPriorityLabel = (priority) => {
+  if (!priority) return '';
+  return priority.charAt(0).toUpperCase() + priority.slice(1);
+};
 
 const handleDragStart = (event) => {
   // Set data transfer for drag operation
@@ -156,5 +196,49 @@ const handleDrop = (event) => {
   border: 2px dashed #4a9eff;
   padding-top: 10px;
   padding-bottom: 10px;
+}
+/* Priority styling */
+.priority-urgent {
+  border-left: 5px solid #ea384c !important;
+}
+
+.priority-high {
+  border-left: 5px solid #9b87f5 !important;
+}
+
+.priority-medium {
+  border-left: 5px solid #FEF7CD !important;
+}
+
+.priority-low {
+  border-left: 5px solid #F2FCE2 !important;
+}
+
+.tvd__priority-badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 3px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.priority-badge-urgent {
+  background-color: #ffebee;
+  color: #ea384c;
+}
+
+.priority-badge-high {
+  background-color: #f5f0ff;
+  color: #9b87f5;
+}
+
+.priority-badge-medium {
+  background-color: #FEF7CD;
+  color: #777;
+}
+
+.priority-badge-low {
+  background-color: #F2FCE2;
+  color: #4caf50;
 }
 </style>

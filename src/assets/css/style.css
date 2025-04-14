@@ -1,9 +1,6 @@
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css');
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap');
-/* 
-section {
-  padding: 3rem;
-} */
+
 
 .tvd__column__list {
   display: flex;
@@ -435,4 +432,52 @@ hr {
 
 .tvd__card__item:hover {
   transform: translateY(-2px);
+}
+
+/* Priority styles */
+.priority-urgent {
+  border-left: 5px solid #ea384c;
+}
+
+.priority-high {
+  border-left: 5px solid #9b87f5;
+}
+
+.priority-medium {
+  border-left: 5px solid #FEF7CD;
+}
+
+.priority-low {
+  border-left: 5px solid #F2FCE2;
+}
+
+.tvd__priority-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  margin: 3px 0;
+}
+
+.priority-badge-urgent {
+  background-color: #ffebee;
+  color: #ea384c;
+}
+
+.priority-badge-high {
+  background-color: #f5f0ff;
+  color: #9b87f5;
+}
+
+.priority-badge-medium {
+  background-color: #FEF7CD;
+  color: #777;
+}
+
+.priority-badge-low {
+  background-color: #F2FCE2;
+  color: #4caf50;
 }

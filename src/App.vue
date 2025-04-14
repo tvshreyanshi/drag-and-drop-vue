@@ -27,19 +27,22 @@ const response = ref({
           title: 'Card 1',
           description: "<p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.</p>",
           attachment: null,
-          deadlineDate: new Date(new Date().getTime() + 2 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }), 
+          deadldeadlineDate: new Date(new Date().getTime() + 2 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
+          priority: "high" 
         },
         { 
           title: 'Card 2',
           description: "<p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.</p>",
           attachment: null,
           deadlineDate: new Date(new Date().getTime() + 2 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
+          priority: "medium"
         },
         { 
           title: "Card 3",
           description: "<p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.</p>",
           attachment: null,
           deadlineDate: new Date(new Date().getTime() + 2 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
+          priority: "low"
         },
       ],
     },
@@ -51,6 +54,7 @@ const response = ref({
           description: "<p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.</p>",
           attachment: null,
           deadlineDate: new Date(new Date().getTime() + 2 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
+          priority: "urgent"
         }
       ],
     },
@@ -82,6 +86,7 @@ const editData = (event) => {
     response.value.data[arrayIndex].data[itemIndex].description = event.description;
     response.value.data[arrayIndex].data[itemIndex].deadlineDate = event.deadlineDate;
     response.value.data[arrayIndex].data[itemIndex].attachment = event.attachment;
+    response.value.data[arrayIndex].data[itemIndex].priority = event.priority;
   }
 };
 
