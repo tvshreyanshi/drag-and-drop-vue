@@ -19,6 +19,9 @@
         @drag-over="handleDragOver"
         @drag-leave="handleDragLeave"
         @internal-drop="handleInternalDrop"
+        @add-comment="handleAddComment"
+        @add-tag="handleAddTag"
+        @remove-tag="handleRemoveTag"
       />
       
       <!-- Adding new section UI -->
@@ -91,7 +94,7 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(["add-card", "edit-card", "delete-card"]);
+const emit = defineEmits(["add-card", "edit-card", "delete-card", "add-comment", "add-tag", "remove-tag"]);
 
 // Reactive state
 const isModalOpenedLocal = ref(false);
@@ -205,6 +208,22 @@ const deleteCard = () => {
   // Show toast notification
   showToastNotification('Card deleted successfully');
 };
+
+// Comment and tag management
+const handleAddComment = (event) => {
+  emit("add-comment", event);
+  showToastNotification('Comment added');
+};
+
+const handleAddTag = (event) => {
+  emit("add-tag", event);
+  showToastNotification(`Tag "${event.tag}" added`);
+};
+
+const handleRemoveTag = (event) => {
+  emit("remove-tag", event);
+  showToastNotification(`Tag removed`);
+}
 
 // Drag and drop handlers
 const handleDragStart = (sectionIndex, itemIndex) => {

@@ -33,6 +33,9 @@
         @internal-drop="onInternalDrop($event, sectionIndex, itemIndex)"
         @open-edit-modal="$emit('open-edit-modal', item, sectionIndex, itemIndex, $event)"
         @open-delete-modal="$emit('open-delete-modal', sectionIndex, itemIndex)"
+        @add-comment="$emit('add-comment', $event)"
+        @add-tag="$emit('add-tag', $event)"
+        @remove-tag="$emit('remove-tag', $event)"
       />
       
       <!-- Empty state placeholder -->
@@ -74,6 +77,16 @@
                 type="date" 
                 v-model="newCard.deadlineDate" 
                 class="tvd__add-date"
+              />
+            </div>
+
+            <div class="tvd__add-field">
+              <label>Tags (comma separated):</label>
+              <input 
+                type="text" 
+                v-model="newCard.tags" 
+                placeholder="frontend, bug, feature" 
+                class="tvd__add-input"
               />
             </div>
             
@@ -125,14 +138,18 @@ const emit = defineEmits([
   'drag-leave',
   'internal-drop',
   'open-edit-modal',
-  'open-delete-modal'
+  'open-delete-modal',
+  'add-comment',
+  'add-tag',
+  'remove-tag'
 ]);
 
 const newCard = ref({
   title: "",
   description: "",
   priority: "medium",
-  deadlineDate: ""
+  deadlineDate: "",
+  tags: ""
 });
 
 const isDragOver = ref(false);
@@ -189,12 +206,18 @@ const addCard = () => {
       formattedDate = new Date(new Date().getTime() + 2 * 24 * 60 * 60 * 1000)
         .toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
     }
+
+    const tags = newCard.value.tags 
+      ? newCard.value.tags.split(',').map(tag => tag.trim().toLowerCase()).filter(tag => tag !== '') 
+      : [];
     const cardData = {
       title: newCard.value.title,
       description: `<p>${newCard.value.description}</p>`,
       attachment: null,
       deadlineDate: formattedDate,
-      priority: newCard.value.priority
+      priority: newCard.value.priority,
+      comments: [],
+      tags: tags
     };
     
     emit("add-card", props.sectionIndex, cardData);
@@ -204,6 +227,7 @@ const addCard = () => {
     newCard.value.description = "";
     newCard.value.priority = "medium";
     newCard.value.deadlineDate = "";
+    newCard.value.tags = "";
     emit("close-card");
   }
 };

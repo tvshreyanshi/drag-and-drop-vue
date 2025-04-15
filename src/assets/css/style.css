@@ -481,3 +481,96 @@ hr {
   background-color: #F2FCE2;
   color: #4caf50;
 }
+
+
+/* Dark mode overrides */
+.dark-mode .tvd__column__list {
+  background-color: #222;
+}
+
+.dark-mode .tvd__column__item {
+  background-color: #333;
+  border-color: #444;
+}
+
+.dark-mode .tvd__column__title--wrapper h2 {
+  color: #eee;
+}
+
+.dark-mode .tvd__card__item {
+  background-color: #444;
+  color: #eee;
+  border-color: #555;
+}
+
+.dark-mode .tvd__card__tag {
+  color: #eee;
+}
+
+.dark-mode .tvd__icons {
+  color: #ccc;
+}
+
+.dark-mode .tvd__edit_card,
+.dark-mode .tvd__delete_card {
+  color: #ddd;
+}
+
+.dark-mode .tvd__card__empty {
+  border-color: #555;
+  color: #aaa;
+}
+
+.dark-mode .drag-over {
+  background-color: rgba(74, 158, 255, 0.1) !important;
+}
+
+.dark-mode .section-drag-over {
+  background-color: #3a3a3a;
+}
+
+.dark-mode .tvd__add-btn {
+  background-color: #555;
+  color: #eee;
+  border-color: #666;
+}
+
+.dark-mode .tvd__add-btn:hover {
+  background-color: #666;
+}
+
+.dark-mode .tvd__add-input,
+.dark-mode .tvd__add-textarea,
+.dark-mode .tvd__add-select,
+.dark-mode .tvd__add-date {
+  background-color: #444;
+  border-color: #555;
+  color: #eee;
+}
+
+/* Tags in dark mode */
+.dark-mode .tvd__tag {
+  background-color: #3a3a3a;
+  color: #a0c2ff;
+}
+
+.dark-mode .tvd__tag-remove {
+  color: #a0c2ff;
+}
+
+/* Comments in dark mode */
+.dark-mode .tvd__comment {
+  background-color: #3a3a3a;
+}
+
+.dark-mode .tvd__comment-author {
+  color: #ddd;
+}
+
+.dark-mode .tvd__comment-time {
+  color: #aaa;
+}
+
+.dark-mode .tvd__card__comments {
+  border-top-color: #555;
+}
