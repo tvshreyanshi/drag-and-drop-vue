@@ -5,13 +5,10 @@
       @dragleave="handleDragLeave"
       @drop.prevent="handleDrop">
     <!-- Section header -->
-    <div class="tvd__column__title--wrapper">
-      <h2>{{ section.title }}</h2>
-      <i
-        class="tvd__column__item--cta fa-solid fa-plus"
-        @click.prevent="$emit('show-add-card', sectionIndex)"
-      ></i>
-    </div>
+    <SectionHeader 
+      :title="section.title" 
+      @show-add-card="$emit('show-add-card', sectionIndex)" 
+    />
     
     <!-- Cards container -->
     <ul
@@ -36,66 +33,20 @@
         @add-comment="$emit('add-comment', $event)"
         @add-tag="$emit('add-tag', $event)"
         @remove-tag="$emit('remove-tag', $event)"
+        @add-attachment="$emit('add-attachment', $event)"
+        @remove-attachment="$emit('remove-attachment', $event)"
       />
       
-      <!-- Empty state placeholder -->
-      <li v-if="section.data.length === 0" class="tvd__card__empty">
-        <p>Drop cards here</p>
-      </li>
+      <EmptyState v-if="section.data.length === 0" />
       
       <!-- Add card form -->
-      <li class="tvd__card__item" v-if="isAddingCard">
-        <button class="tvd_close_addcard" @click="$emit('close-card')">
-          <i class="tvd__icons fa-solid fa-xmark"></i>
-        </button>
-        <slot name="cardForm">
-          <div>
-            <input
-              v-model="newCard.title"
-              type="text"
-              placeholder="Card Title"
-              class="tvd__add-input"
-            />
-            <textarea
-              v-model="newCard.description"
-              placeholder="Card Description"
-              class="tvd__add-textarea"
-            ></textarea>
-            <div class="tvd__add-field">
-              <label>Priority:</label>
-              <select v-model="newCard.priority" class="tvd__add-select">
-                <option value="urgent">Urgent</option>
-                <option value="high">High</option>
-                <option value="medium">Medium</option>
-                <option value="low">Low</option>
-              </select>
-            </div>
-            
-            <div class="tvd__add-field">
-              <label>Deadline:</label>
-              <input 
-                type="date" 
-                v-model="newCard.deadlineDate" 
-                class="tvd__add-date"
-              />
-            </div>
-
-            <div class="tvd__add-field">
-              <label>Tags (comma separated):</label>
-              <input 
-                type="text" 
-                v-model="newCard.tags" 
-                placeholder="frontend, bug, feature" 
-                class="tvd__add-input"
-              />
-            </div>
-            
-            <button class="tvd__add-btn" @click.prevent="addCard">
-              <h6>{{ addCardTitle }}</h6>
-            </button>
-          </div>
-        </slot>
-      </li>
+      <NewCardForm
+        v-if="isAddingCard"
+        :section-index="sectionIndex"
+        :add-card-title="addCardTitle"
+        @close-card="$emit('close-card')"
+        @add-card="$emit('add-card', $event[0], $event[1])"
+      />
     </ul>
     
     <!-- Add card button -->
@@ -108,6 +59,9 @@
 <script setup>
 import { ref, defineProps, defineEmits } from "vue";
 import BoardCard from "./BoardCard.vue";
+import SectionHeader from "./section/SectionHeader.vue";
+import EmptyState from "./section/EmptyState.vue";
+import NewCardForm from "./section/NewCardForm.vue";
 
 const props = defineProps({
   section: {
@@ -141,16 +95,10 @@ const emit = defineEmits([
   'open-delete-modal',
   'add-comment',
   'add-tag',
-  'remove-tag'
+  'remove-tag',
+  'add-attachment',
+  'remove-attachment'
 ]);
-
-const newCard = ref({
-  title: "",
-  description: "",
-  priority: "medium",
-  deadlineDate: "",
-  tags: ""
-});
 
 const isDragOver = ref(false);
 
@@ -191,46 +139,6 @@ const onInternalDrop = (event, sectionIndex, itemIndex) => {
   emit('internal-drop', sectionIndex, itemIndex);
 };
 
-const addCard = () => {
-  if (newCard.value.title.trim() !== "") {
-    let formattedDate = "";
-    if (newCard.value.deadlineDate) {
-      const date = new Date(newCard.value.deadlineDate);
-      formattedDate = date.toLocaleDateString('en-US', { 
-        month: 'short', 
-        day: '2-digit', 
-        year: 'numeric' 
-      });
-    } else {
-      // Default to 2 days from now
-      formattedDate = new Date(new Date().getTime() + 2 * 24 * 60 * 60 * 1000)
-        .toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
-    }
-
-    const tags = newCard.value.tags 
-      ? newCard.value.tags.split(',').map(tag => tag.trim().toLowerCase()).filter(tag => tag !== '') 
-      : [];
-    const cardData = {
-      title: newCard.value.title,
-      description: `<p>${newCard.value.description}</p>`,
-      attachment: null,
-      deadlineDate: formattedDate,
-      priority: newCard.value.priority,
-      comments: [],
-      tags: tags
-    };
-    
-    emit("add-card", props.sectionIndex, cardData);
-    
-    // Reset form
-    newCard.value.title = "";
-    newCard.value.description = "";
-    newCard.value.priority = "medium";
-    newCard.value.deadlineDate = "";
-    newCard.value.tags = "";
-    emit("close-card");
-  }
-};
 </script>
 
 <style>
@@ -244,40 +152,11 @@ const addCard = () => {
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
-.tvd__card__empty {
-  border: 2px dashed #ccc;
-  border-radius: 6px;
-  padding: 20px;
-  margin-bottom: 8px;
-  text-align: center;
-  color: #999;
-  min-height: 80px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.tvd__card__empty p {
+.tvd__card__list {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 0;
   margin: 0;
-}
-/* New card form styles */
-.tvd__add-field {
-  margin-bottom: 10px;
-}
-
-.tvd__add-field label {
-  display: block;
-  margin-bottom: 5px;
-  font-weight: 500;
-  font-size: 14px;
-}
-
-.tvd__add-select,
-.tvd__add-date {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  margin-bottom: 10px;
+  list-style: none;
 }
 </style>

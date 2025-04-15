@@ -574,3 +574,192 @@ hr {
 .dark-mode .tvd__card__comments {
   border-top-color: #555;
 }
+/* Toast notifications */
+.tvd__toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 12px 20px;
+  background-color: #333;
+  color: white;
+  border-radius: 6px;
+  z-index: 1000;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.tvd__toast-success {
+  background-color: #43a047;
+}
+
+.tvd__toast-error {
+  background-color: #e53935;
+}
+
+.tvd__toast-info {
+  background-color: #039be5;
+}
+
+.tvd__toast-warning {
+  background-color: #fb8c00;
+}
+
+.tvd__toast-enter-from,
+.tvd__toast-leave-to {
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+/* Attachment styles */
+.tvd__file-icon {
+  width: 40px;
+  height: 40px;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  font-size: 18px;
+}
+
+.tvd__file-image {
+  max-width: 100%;
+  max-height: 150px;
+  border-radius: 4px;
+  margin-top: 5px;
+}
+
+/* Activity styles */
+.tvd__activity-item {
+  padding: 8px;
+  margin-bottom: 5px;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.tvd__activity-time {
+  font-size: 11px;
+  color: #999;
+  margin-top: 3px;
+}
+
+/* Board sharing and templates */
+.tvd__board-sharing-link {
+  display: flex;
+}
+
+.tvd__board-sharing-input {
+  flex-grow: 1;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px 0 0 4px;
+}
+
+.tvd__board-sharing-copy {
+  padding: 8px 12px;
+  background-color: #4a6cff;
+  color: white;
+  border: none;
+  border-radius: 0 4px 4px 0;
+  cursor: pointer;
+}
+
+.tvd__template-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.tvd__template-item {
+  background-color: white;
+  border-radius: 6px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  padding: 15px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tvd__template-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* Export/Import styles */
+.tvd__export-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.tvd__export-btn {
+  padding: 8px 15px;
+  background-color: #f0f0f0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.tvd__export-btn:hover {
+  background-color: #e0e0e0;
+}
+
+.tvd__import-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 15px;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.tvd__import-label:hover {
+  background-color: #e0e0e0;
+}
+
+
+/* Attachment and activity in dark mode */
+.dark-mode .tvd__file-icon {
+  background-color: #555;
+  color: #ddd;
+}
+
+.dark-mode .tvd__activity-item {
+  background-color: #3a3a3a;
+}
+
+.dark-mode .tvd__activity-time {
+  color: #aaa;
+}
+
+.dark-mode .tvd__template-item {
+  background-color: #444;
+  color: #eee;
+}
+
+.dark-mode .tvd__export-btn,
+.dark-mode .tvd__import-label {
+  background-color: #444;
+  color: #eee;
+}
+
+.dark-mode .tvd__export-btn:hover,
+.dark-mode .tvd__import-label:hover {
+  background-color: #555;
+}
+
+.dark-mode .tvd__board-sharing-input {
+  background-color: #444;
+  border-color: #555;
+  color: #eee;
+}

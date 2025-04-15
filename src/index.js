@@ -6,9 +6,16 @@ import BoardCard from "./BoardCard.vue";
 import AddListForm from "./AddListForm.vue";
 import AddSectionButton from "./AddSectionButton.vue";
 import DragDropManager from "./DragDropManager.vue";
+import SectionHeader from "./section/SectionHeader.vue";
+import EmptyState from "./section/EmptyState.vue";
+import NewCardForm from "./section/NewCardForm.vue";
 import './assets/css/style.css';
 
 export { SimpleDragVue, EditModalVue, BoardSection, DeleteConfirmationVue, BoardCard,
     AddListForm,
     AddSectionButton,
-    DragDropManager };
+    DragDropManager,
+    SectionHeader,
+    EmptyState,
+    NewCardForm
+ };
